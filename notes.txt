@@ -1,0 +1,5 @@
+psql --username postgres
+CREATE DATABASE musicapp;
+npm run migrate create "create table albums"
+npm run migrate create "create table songs"
+npm run migrate up
