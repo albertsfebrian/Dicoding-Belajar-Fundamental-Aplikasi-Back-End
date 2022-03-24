@@ -2,4 +2,12 @@ psql --username postgres
 CREATE DATABASE musicapp;
 npm run migrate create "create table albums"
 npm run migrate create "create table songs"
+npm run migrate create "create table users"
+npm run migrate create "create table authentications"
+npm run migrate create "create table playlists"
+npm run migrate create "create table playlist_songs"
+npm run migrate create "create table collaborations"
+npm run migrate create "create table playlist_song_activities"
 npm run migrate up
+
+truncate albums, songs, users, authentications, playlists, playlist_songs, playlist_song_activities, collaborations;

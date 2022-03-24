@@ -13,7 +13,7 @@ class SongsService {
     const {
       title, year, genre, performer, duration, albumId,
     } = props;
-    const id = nanoid(16);
+    const id = `song-${nanoid(16)}`;
     const createdAt = new Date().toISOString();
     const updatedAt = createdAt;
 
