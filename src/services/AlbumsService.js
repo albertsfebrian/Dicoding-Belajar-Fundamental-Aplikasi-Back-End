@@ -39,15 +39,14 @@ class AlbumsService {
     const normalizedAlbum = result.rows.map(mapDBToModel)[0];
 
     const songsQuery = {
-      text: 'SELECT * FROM songs WHERE album_id = $1',
+      text: 'SELECT id, title, performer FROM songs WHERE album_id = $1',
       values: [id],
     };
     const songsResult = await this._pool.query(songsQuery);
-    const normalizedSongs = songsResult.rows.map(mapDBToSongModel);
 
     const joinedAlbum = {
       ...normalizedAlbum,
-      songs: normalizedSongs,
+      songs: songsResult.rows,
     };
     return joinedAlbum;
   }
