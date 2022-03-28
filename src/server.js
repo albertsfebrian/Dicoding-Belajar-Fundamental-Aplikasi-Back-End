@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const Hapi = require('@hapi/hapi');
 const Jwt = require('@hapi/jwt');
+const path = require('path');
 // Albums
 const albums = require('./api/albums');
 const AlbumsService = require('./services/AlbumsService');
@@ -27,17 +28,27 @@ const CollaborationsValidator = require('./validator/collaborations');
 const playlists = require('./api/playlists');
 const PlaylistsService = require('./services/PlaylistsService');
 const PlaylistsValidator = require('./validator/playlists');
+// Exports
+const _exports = require('./api/exports');
+const ProducerService = require('./services/ProducerService');
+const ExportsValidator = require('./validator/exports');
+// Storage
+const StorageService = require('./services/StorageService');
+// Cache
+const CacheService = require('./services/CacheService');
 
 // Error
 const ClientError = require('./exceptions/ClientError');
 
 const init = async () => {
-  const albumsService = new AlbumsService();
+  const cacheService = new CacheService();
+  const albumsService = new AlbumsService(cacheService);
   const songsService = new SongsService();
   const usersService = new UsersService();
   const authenticationsService = new AuthenticationsService();
   const collaborationsService = new CollaborationsService(usersService);
   const playlistsService = new PlaylistsService(collaborationsService, songsService);
+  const storageService = new StorageService(path.resolve(__dirname, 'uploads'));
 
   const server = Hapi.server({
     port: process.env.PORT,
@@ -85,7 +96,18 @@ const init = async () => {
     if (response instanceof Error) {
       const { output = {} } = response;
       const { statusCode, message } = output;
-
+      console.error(response);
+      if (statusCode === 413) {
+        return response;
+      }
+      if (statusCode === 415) {
+        const newResponse = h.response({
+          status: 'fail',
+          message: 'Unsupported Media Type',
+        });
+        newResponse.code(400);
+        return newResponse;
+      }
       if (statusCode === 401) {
         const newResponse = h.response({
           status: 'fail',
@@ -112,6 +134,7 @@ const init = async () => {
       plugin: albums,
       options: {
         service: albumsService,
+        storageService,
         validator: AlbumsValidator,
       },
     },
@@ -152,6 +175,14 @@ const init = async () => {
         collaborationsService,
         service: playlistsService,
         validator: PlaylistsValidator,
+      },
+    },
+    {
+      plugin: _exports,
+      options: {
+        service: ProducerService,
+        playlistsService,
+        validator: ExportsValidator,
       },
     },
   ]);

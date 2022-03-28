@@ -1,6 +1,7 @@
 const Joi = require('joi');
 
 const currentYear = new Date().getFullYear();
+const acceptedMimeType = ['image/apng', 'image/avif', 'image/gif', 'image/jpeg', 'image/png', 'image/svg+xml', 'image/webp'];
 
 const AlbumPayloadSchema = Joi.object({
   name: Joi.string().required(),
@@ -8,4 +9,8 @@ const AlbumPayloadSchema = Joi.object({
     .required(),
 });
 
-module.exports = { AlbumPayloadSchema };
+const AlbumCoverSchema = Joi.object({
+  'content-type': Joi.string().valid(...acceptedMimeType).required(),
+}).unknown(true);
+
+module.exports = { AlbumPayloadSchema, AlbumCoverSchema };

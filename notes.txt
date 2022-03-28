@@ -8,6 +8,7 @@ npm run migrate create "create table playlists"
 npm run migrate create "create table playlist_songs"
 npm run migrate create "create table collaborations"
 npm run migrate create "create table playlist_song_activities"
+npm run migrate create "user_album_likes"
 npm run migrate up
 
-truncate albums, songs, users, authentications, playlists, playlist_songs, playlist_song_activities, collaborations;
+truncate albums, songs, users, authentications, playlists, playlist_songs, playlist_song_activities, collaborations, user_album_likes;
